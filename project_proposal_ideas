@@ -1,0 +1,28 @@
+# STA 135 Project Proposals:
+# data, question, method.
+# 20130124 Hugh Crockford
+
+1.	Facebook network mapping
+		Data:		Facebook100 dataset.	
+		Question:	Can we predict if an individual will be a friend of another based on what groups they belong to?
+		Method:		Random forests? SVM?
+
+2.	Recommendation engine
+		Data:		IMDB API (http://www.imdb.com/interfaces), Yahoo! Music ratings (http://webscope.sandbox.yahoo.com/catalog.php?datatype=r)
+		Question:	Develop	algorithm to reccomend other related content.
+		Method:		Reccomendation engine.
+
+3.	Ad revenue prediction
+		Data:		Yahoo! Search marketing advertiser: ad revenue, clicks, keywords. Source: http://webscope.sandbox.yahoo.com/catalog.php?datatype=a
+		Question:	Which keywords are more likely to get clickthroughs = revenue.
+		Method:		Predict ad revenue from keywords - Regression? SEM?
+
+4.	Youtube rating predictor
+		Data:		Youtube dataset (http://netsg.cs.sfu.ca/youtubedata/)
+		Question:	Can we predict a video's rating/number of views from a list of related id's
+		Method:		Predict rating/views - Regression? SEM?
+
+5.	Any Kaggle Competition?
+		Heritage Health - predict who will be admitted to hospital
+		Census return rates.
+		GE Hospital.

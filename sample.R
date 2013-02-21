@@ -8,9 +8,3 @@ sampFB = function(file, num){
 	samplines = sample(1:numlines, round(num/10))
 	sapply(samplines,function(i) {scan(file=file, what = character(),n=10,skip=i)})
 }
-
-fbfile = "~/data/fb_mhrw.txt"
-
-sampFB(fbfile, 100)
-
-

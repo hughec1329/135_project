@@ -1,4 +1,4 @@
-# STA 135 Project
+# STA 135 Project 
 # poke around netowrk relationships in fb dataset
 # 20130120 HCrockford
 
@@ -23,9 +23,8 @@ max(sapply(strsplit(as.character(props$NID),"|",fixed = TRUE),length))	# get amx
 
 try = lapply(props, function(i) c(i[-5],strsplit(as.character(i[5]),"|",fixed = TRUE)))
 
-
 u = data.frame(id = c(1,2,3,4,5), NID = c("23","23|2343","3434","342","343|344"))
-o = apply(u,1,function(i) c(i[1],strsplit(as.character(i[2]),"|",fixed = TRUE)))
+o = apply(u,1,function(i) c(i[1],strsplit(as.character(i[2]),"|",fixed = TRUE)))	# how to ref and name nid?
 
 
 

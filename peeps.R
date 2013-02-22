@@ -1,6 +1,11 @@
 # STA 135 - fb network analyisis try
 # 20130221 HCrockford
 
+# install.packages(c("sna","network","statnet")) # FYI
+library(statnet)
+library(sna)
+library(network)
+
 fb = readLines("~/data/fb_samp.txt")
 ff = strsplit(fb, " ")	# uid vs firend id? uids low, firned id > 950,000?
 play = ff[1:10]
@@ -13,6 +18,8 @@ t[1] %in% t[2]		# cause not all t1 in t2
 t[3] %in% t[1]		# nope?? wtf?
 any(t[1] %in% t[2])	# how check if one firend in anothers firend list yet keep vecotirsed ??
 
+match(t[1],t[3])
+match(1:5,3:10)
 
 
 

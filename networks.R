@@ -15,6 +15,14 @@ sum(popularNets[1:20])	# first 20 most popular nets acocunt for 110k peeps.
 sum(popularNets[1:20])/sum(popularNets)		# top 20 nets cover 20% of popn
 
 
+# total number of firneds 
+max(props$totFR)	# max friends = ~5000
+plot(cumsum(table(props$totFR))/sum(table(props$totFR)))	# most peeps have less than 500 friends
+cumsum(table(props$totFR))/sum(table(props$totFR)) > .9	# 90% have < 382 friends.
+
+
+
+# nets
 max(sapply(strsplit(as.character(props$NID),"|",fixed = TRUE),length))	# get amx number of nets anyone belongs to. = 5
 
 # how to structure - in list? 

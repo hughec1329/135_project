@@ -1,12 +1,12 @@
 # STA 135 - fb network analyisis try
 # 20130221 HCrockford
 
-# install.packages(c("sna","network","statnet")) # FYI
-library(statnet)
+# install.packages(c("sna","network","statnet")) # FYI - useful packages.
+library(statnet)	#written in C, should be fast.
 library(sna)
 library(network)
 
-fb = readLines("~/data/fb_samp.txt")
+fb = readLines("~/data/fb_samp.txt")	# first 1000 lines from head -n 1000
 ff = strsplit(fb, " ")	# uid vs firend id? uids low, firned id > 950,000?
 play = ff[1:10]
 dup = 

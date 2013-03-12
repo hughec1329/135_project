@@ -6,6 +6,8 @@
 
 lnumber=$(cat ~/data/mhrw-nodeproperties-anonymized.txt | cut -d "#" -f 5 | tr "|" " " | grep -nr "^"$2 | cut -d ":" -f 1)	# find line numbers of net match. ( could do simple grep but will get user ids with net name included.)
 
+# STILL MISSING IF SECOND NET - need to work on grep statement to allow anywhere but only if preceed by space OR at start
+
 for i in $lnumber
 do
 	# awk 'NR=='$i'{print $0}' $1 >> 'net_'$2.txt	# return that line

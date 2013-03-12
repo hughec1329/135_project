@@ -9,5 +9,6 @@ nets=$(cat ~/data/topnets | awk -F " " '{print $2}' | head -n 100)
 
 for t in $nets
 do
-	./getnet.sh ~/data/fb_mhrw.txt $i > net_$t.txt
+	# ./getnet.sh ~/data/fb_mhrw.txt $i > net_$t.txt
+	echo "foo" >> "~/data/stripped/net_"$t".txt"
 done

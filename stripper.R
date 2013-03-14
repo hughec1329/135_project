@@ -21,12 +21,12 @@ it = dbGetQuery(con, arg)		# WORKING?
 net = c(112,234)
 ret = list()
 
-retun = for(i in net){		# not working in loop?? - returns nothing.
+sapply(net, function(i){
 	lin = as.integer(system(paste("./justgetnum.sh", i),intern=TRUE))
 	lines = paste(lin,collapse=",")
 	arg = sprintf("SELECT * FROM fb WHERE no IN (%s);",lines)
-	return(dbGetQuery(con, arg))		# WORKING?
-}
+	dbGetQuery(con, arg)
+})
 
 
 

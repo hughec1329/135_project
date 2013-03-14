@@ -3,7 +3,6 @@
 # 20130313
 
 library(MonetDB.R)
-library(RMonetDB)
 "SELECT * FROM sys.fb WHERE no IN (" t ")" 
 
 con = dbConnect(MonetDB.R(),"monetdb://localhost/fb",timeout = 99999)
@@ -11,27 +10,29 @@ dbListTables(con)
 
 dbGetQuery(con, "SELECT * FROM fb WHERE no = 3")
 
-
-net = 291
+net = 69
 lin = as.integer(system(paste("./justgetnum.sh", net),intern=TRUE))
 lines = paste(lin,collapse=",")
 arg = sprintf("SELECT * FROM fb WHERE no IN (%s);",lines)
 it = dbGetQuery(con, arg)		# WORKING?
 
-net = c(112,234)
-ret = list()
+makeedge = function(i) {
+	fr = as.integer(strsplit(as.character(df[2])," ")[[1]][-1])
+	cbind(i[1],fr)
+}
 
-sapply(net, function(i){
-	lin = as.integer(system(paste("./justgetnum.sh", i),intern=TRUE))
+
+net = c(112,234)
+
+ret = sapply(net, function(i){
+       	lin = as.integer(system(paste("./justgetnum.sh", i),intern=TRUE))
 	lines = paste(lin,collapse=",")
 	arg = sprintf("SELECT * FROM fb WHERE no IN (%s);",lines)
-	dbGetQuery(con, arg)
+	matrix(unlist(dbGetQuery(con, arg)),,2)
 })
 
 
-
-
-
+out = data.frame(do.call("rbind",apply(ret,1,makeedge)))
 
 dbGetQuery(con, "SELECT * FROM fb WHERE no IN (32,424,6454);")	# works fine
 fin = dbSendQuery(con, arg)
@@ -45,7 +46,3 @@ system("mclient -d fb < arg.txt", intern = TRUE)
 
 nom = system(paste("./dbget.sh", net),intern = TRUE)
 system(paste("mclient -d fb < ",nom) , intern = TRUE)
-
-
-
-

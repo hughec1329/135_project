@@ -19,4 +19,6 @@ do
 	 sed $i'q;d' $1 >> 'net_'$2.txt
 done
 
+echo "finished network " $2  "<3 from rcloud xoxo" | mail -s "finished net!" hughcrockford@gmail.com
+
 	

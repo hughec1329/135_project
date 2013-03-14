@@ -1,6 +1,6 @@
 #!/bin/sh
 
-nets=$(cat ./topnets | awk -F " " '{print $2}' | head -n 1000)
+nets=$(cat ./topnets | awk -F " " '{print $2}' | head -n 100)
 
 for i in $nets
 do

@@ -4,11 +4,11 @@
 
 
 
-nets=$(cat ~/data/topnets | awk -F " " '{print $2}' | head -n 100)
+nets=$(cat ./topnets | awk -F " " '{print $2}')
 # top 100 nets
 
 for t in $nets
 do
-	./getnet.sh ~/data/fb_mhrw.txt $t >> "/home/hugh/data/stripped/net_"$t".txt"
+	./getnet.sh /home/hugh/data/fb_mhrw.txt $t 
 	echo "done " $t 
 done

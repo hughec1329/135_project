@@ -16,7 +16,7 @@ for i in $lnumber
 do
 	# awk 'NR=='$i'{print $0}' $1 >> 'net_'$2.txt	# return that line
 	 # head -n $i $1 | tail -n 1 # >> 'net_'$2.txt	# much faster
-	 sed $i'q;d' $1 >> 'net_'$2.txt
+	 sed $i'q;d' $1 >> '/home/hugh/data/stripped/net_'$2.txt
 done
 
 echo "finished network " $2  "<3 from rcloud xoxo" | mail -s "finished net!" hughcrockford@gmail.com

@@ -11,7 +11,7 @@ dbListTables(con)
 
 dbGetQuery(con, "SELECT * FROM fb WHERE no = 3")
 
-net = 69
+net = 112
 lin = as.integer(system(paste("./justgetnum.sh", net),intern=TRUE))
 lines = paste(lin,collapse=",")
 arg = sprintf("SELECT * FROM fb WHERE no IN (%s);",lines)
@@ -27,37 +27,38 @@ makeedge = function(i) {
 
 out = data.frame(do.call("rbind",apply(it,1,makeedge)))
 outt = graph.data.frame(out,directed = FALSE)
+apl.noloner = average.path.length(outt,directed=F)#does NOT include friends with no connections.
+apl.loner = average.path.length(outt,directed=F,unconnected=F)#friends that aren't connected are given the max. length
+nedge = sum(degree(outt))#sum of number of edges incident to each node
+nnode = length(V(outt))#number of nodes
+nncluster = clusters(outt)$no	#clusters
+trans = transitivity(outt, type="global")#prob. a user's friends are friends
+diam = diameter(outt)#length of the longest connection in the graph
+dens = graph.density(outt)#ratio of number of edges divided by number of possible edges
 
-average.path.length(g,directed=F)#does NOT include friends with no connections.
-average.path.length(g,directed=F,unconnected=F)#friends that aren't connected are given the max. length
-sum(degree(g))#sum of number of edges incident to each node
-length(V(g))#number of nodes
-clusters(g)#clusters
-transitivity(g, type="global")#prob. a user's friends are friends
-diameter(g)#length of the longest connection in the graph
-graph.density(g)#ratio of number of edges divided by number of possible edges
 
-
-net = c(112,234)
-
-ret = sapply(net, function(i){
+spit = 	function(i){
        	lin = as.integer(system(paste("./justgetnum.sh", i),intern=TRUE))
 	lines = paste(lin,collapse=",")
 	arg = sprintf("SELECT * FROM fb WHERE no IN (%s);",lines)
-	matrix(unlist(dbGetQuery(con, arg)),,2)
-})
+	it = dbGetQuery(con, arg)
+	out = data.frame(do.call("rbind",apply(it,1,makeedge)))
+	outt = graph.data.frame(out,directed = FALSE)
+	apl.noloner = average.path.length(outt,directed=F)
+	apl.loner = average.path.length(outt,directed=F,unconnected=F)
+		nedge = sum(degree(outt))
+	nnode = length(V(outt))		
+	ncluster = clusters(outt)$no		
+	trans = transitivity(outt, type="global")
+	diam = diameter(outt)
+	dens = graph.density(outt)
+	c(apl.noloner,apl.loner,nnode,ncluster,trans,diam,dens)
+}
 
 
+net = c(112,234)
+ret = data.frame(t(sapply(net, spit)))
+row.names(ret) = net
+names(ret) = c("apl.noloner","apl.loner","nnode","ncluster","trans","diam","dens")
+ret
 
-dbGetQuery(con, "SELECT * FROM fb WHERE no IN (32,424,6454);")	# works fine
-fin = dbSendQuery(con, arg)
-fetch(fin)	# cant fetch monet?
-
-monet.frame(con, arg)
-
-# works when I write to file then read in?? 
-write(arg,"arg.txt")
-system("mclient -d fb < arg.txt", intern = TRUE)
-
-nom = system(paste("./dbget.sh", net),intern = TRUE)
-system(paste("mclient -d fb < ",nom) , intern = TRUE)

@@ -4,38 +4,12 @@
 
 library(MonetDB.R)
 library(igraph)
-"SELECT * FROM sys.fb WHERE no IN (" t ")" 
-
 con = dbConnect(MonetDB.R(),"monetdb://localhost/fb",timeout = 99999)
-dbListTables(con)
-
-dbGetQuery(con, "SELECT * FROM fb WHERE no = 3")
-
-net = 112
-lin = as.integer(system(paste("./justgetnum.sh", net),intern=TRUE))
-lines = paste(lin,collapse=",")
-arg = sprintf("SELECT * FROM fb WHERE no IN (%s);",lines)
-it = dbGetQuery(con, arg)		# WORKING?
 
 makeedge = function(i) {
 	fr = as.integer(strsplit(as.character(i[2])," ")[[1]][-1])
 	cbind(i[1],fr)
 }
-
-# strip = apply(it[3:6,],1,makeedge)
-
-
-out = data.frame(do.call("rbind",apply(it,1,makeedge)))
-outt = graph.data.frame(out,directed = FALSE)
-apl.noloner = average.path.length(outt,directed=F)#does NOT include friends with no connections.
-apl.loner = average.path.length(outt,directed=F,unconnected=F)#friends that aren't connected are given the max. length
-nedge = sum(degree(outt))#sum of number of edges incident to each node
-nnode = length(V(outt))#number of nodes
-nncluster = clusters(outt)$no	#clusters
-trans = transitivity(outt, type="global")#prob. a user's friends are friends
-diam = diameter(outt)#length of the longest connection in the graph
-dens = graph.density(outt)#ratio of number of edges divided by number of possible edges
-
 
 spit = 	function(i){
        	lin = as.integer(system(paste("./justgetnum.sh", i),intern=TRUE))
@@ -56,9 +30,30 @@ spit = 	function(i){
 }
 
 
+grab = function(i){
+	ret = data.frame(t(sapply(i, spit)))
+	row.names(ret) = i
+	names(ret) = c("apl.noloner","apl.loner","nnode","ncluster","trans","diam","dens")
+	return(ret)
+}
+
+
 net = c(112,234)
-ret = data.frame(t(sapply(net, spit)))
-row.names(ret) = net
-names(ret) = c("apl.noloner","apl.loner","nnode","ncluster","trans","diam","dens")
-ret
+fbak = grab(net)	# working
+
+
+## finding nets we want to sample
+
+topnet = read.table("topnets")
+hist(topnet[,1])
+plot(topnet[,1])
+range(unique(topnet[,1]))
+head(topnet)
+topnet[150:180,]
+topnet[topnet[,1] %in% seq(500,50,-50),]
+int = c(1,2,4,5,6,9,13,15,18,23,30,35,48,69,93,118,167,208,239,273,309,376,471,609,959)	
+ournet = topnet[int,2]	# 25 nets spread throughout size range.
+
+fbak(grab(ournet))
+
 

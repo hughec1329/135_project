@@ -55,6 +55,7 @@ topnet[topnet[,1] %in% seq(500,50,-50),]
 int = c(1,2,4,5,6,9,13,15,18,23,30,35,48,69,93,118,167,208,239,273,309,376,471,609,959)	
 ournet = topnet[int,2]	# 25 nets spread throughout size range.
 
-fbak = grab(ournet)
+fbak = grab(ournet)	# started 1105
+			# finito!
 
 

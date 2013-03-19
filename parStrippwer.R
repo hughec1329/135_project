@@ -2,6 +2,8 @@
 # R sctipt to pull from moetdb by net, calc, and throw away
 # 20130313
 
+# used on amazon ec2 - m3.2xlarge - 8core 30gb.
+
 library(MonetDB.R)
 library(igraph)
 library(parallel)
@@ -107,7 +109,7 @@ row.names(ret) = net
 names(ret) = c("neeps","apl.noloner","apl.loner","nedge","nnode","ncluster","trans","diam","dens")
 
 ### ACTUALLY USED
-o = clusterApplyLB(cl,t(outt),function(i) stripspit(data.frame(i)))
 outt = lapply(nets, grab)
+o = clusterApplyLB(cl,t(outt),function(i) stripspit(data.frame(i)))
 
 

@@ -1,0 +1,96 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\title{STA242 - HW05 - Parallel Computing}
+\author{Hugh Crockford}
+\date{\today}
+\begin{document}
+	\maketitle
+	\section{Planes data}
+		I initially tried to load the delay data into local mysql that I'd used for last assignment, which could be randomly sample with ORDER BY RAND LIMIT 100,000.
+		Unfortunately my poor little laptop with a 128gb SSD just couldn't handle the size of resulting db, and when I tried with a local monet chasing the speed increases I saw in last assignment I encountered the same problem.
+
+
+		I investigated doing computations on an amazon instance, but would need to set up a database server as well, and then wget the massive files. 
+		As amazon charges by volume transferred, this would be an expensive proposition, and been a poor student/state employee, I decided against it.
+
+
+		Due to these size limitations I decided to implement in parallel another large dataset problem that I've been working on.
+	\section{Facebook Dataset}
+
+		The project is looking at relationships between Facebook networks, and the data are a sampling of almost a million Facebook users and their friends.
+		Another file contains the properties of each user, consisting of total number of friends and the networks they belonged to.
+
+
+		We were interested in the similarities between networks, so the first task was to locate members of each network in the large friends file by referencing each members properties, in much the same way as we were to sample the flights file.
+		
+		\subsection{Preparatory data munging}
+		I initially tried to use shell tools to split the big friends file into a separate file for each network, (getnet.sh,stripnet.sh).
+		Awk was used to match net id to each person and return their line number, then copy that line into another file for each network. 
+		I tried head/tail to extract the line, but this was very slow. The fastest method I could come up with was sed, but even this took 3 hours to do a network with 5000 members, and unnecessarily copied the file.
+
+
+		I decided to get the project done this year, we'd need to use databases.
+		As the number of friends of each user varied, I was unable to store each friend in its own column, and decided to split each line into the user id and a string containing all friends.
+		The friends file was space separated, so I used sed and regular expressions to translate the first space into a comma to allow importing the file into monetdb as a csv file.
+
+
+		After setting up a monet user for R with password stored in user file so we didn't need to enter it each query, the data could be returned from R using a db connection, but we still needed to only get the members of each network.
+		We used a system call to the awk shell command above (justgetnum.sh) to return the line numbers of each member.
+		Using paste and sprintf, the database query was created and results returned as a data frame which could be transformed to an edgelist and network variables computed using igraph package.
+
+
+		The queries from R worked initially, but the repeated requests when query was within loop caused funny things to happen to the db.
+		On loading the data the db was ~14 gb, but with each successive query, the db file size would increase substantially until the hdd was full and monet couldn't process query as it had nowhere to store results.
+		I'm not sure if this was an error on my part, but found users complaining of similar on Stack Overflow, and a few answers from the monet dev team that was blaming the OS's handling of I/O, as monet doesn't do memory managing itself. 
+
+
+
+		\subsection{Calculating variables}
+		After all this preparatory work I sapply'd over the most popular 1000 networks ( identified with a piped grep,cut,sort,uniq -c command).
+		Unfortunately this took a very long time, and I made the mistake of not saving any interim data, so after running for 24 hours I cancelled the command and had nothing to show for it.
+
+
+		I altered the script to echo running results into a file using a system call so there would be something to show for all the wasted electricity,and could keep an eye on this file with tail -f and wc -l to make sure it was ticking along.
+		Another method of monitoring this script was via email.
+		After installing mailutils I could call an smtp mailserver from within the script in each loop to send me an email updating me on it's progress.
+
+
+		I started this script on the topnets but this time inverted the topnet list to get variables on the faster smaller nets first.
+
+		\subsection{Parallelizing the process - Amazon EC2}
+		While this script was running on my local machine I rented an Amazon EC2 extra large spot instance, with 30gb ram and 8 cores that cost a whopping 12 cents an hour.
+		I used a tmux session though ssh that allowed me to control R and monitor the output, and let me disconnect and reconnect without stopping the process.
+		After downloading and setting up monetdb, I wget data from web (initially tried scp but transferring 1gb file would've taken half an hour (6cents!)) and set up database as explained above.
+
+
+		Cloning the github repo was a fast way to transfer all script files to cloud, and once database was set up I created a cluster with fork, and set it running on topnets.
+		The script ran as expected, and I could see the 8 processes spike on top, but no output was produced and it looked like R had crashed.
+		After breaking it down I discovered monetdb couldn't handle the multiple simultaneous requests and required a reboot each time the file was run. I'm not sure if this is a limitation of monetdb or if I hadn't installed it correctly.
+
+
+		I ended up splitting the process into two steps, the fast data extraction from database in the first function was achieved in a regular sapply which allowed monet to keep up, and parallelizing the slow variable calculation in the second.
+		I tried numerous parallel functions (clusterApply, parApply, parLapplyLB etc) but struggled with the nested list/matrix structure of my input data and how to apply over it.
+		After much trial and error, I eventually managed to get clusterApplyLB to work.
+		What had taken me 4 hours to do locally took 20 minutes when done in parallel on the amazon instance, and after letting it run for 26 hours, I'd collected the summary variables on ~900 networks for a total cost of \$3.11, while my local machine was still up to 200 nets.
+
+			
+	\section{Conclusion}
+		Doing these calculations in parallel significantly sped up variable calculation and made an otherwise difficult and long task manageable.
+		These skills will come in handy for research I am completing in the spring involving databases of cow milk production and temperature records.
+
+
+	\section{Git}
+		 A github repo containing all relevant files can be found at: https://github.com/hughec1329/
+
+\newpage
+	\section{CODE}
+	\subsection{R}
+		\lstinputlisting[breaklines=TRUE]{parStrippwer.R}
+	\newpage
+	\subsection{shell}
+		\lstinputlisting[breaklines=TRUE]{getnet.sh}
+		\lstinputlisting[breaklines=TRUE]{makeedge.sh}
+		\lstinputlisting[breaklines=TRUE]{stripnet.sh}
+\end{document}
